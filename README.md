@@ -22,7 +22,9 @@ Please feel free to provide content and comments.
 * StataCorp. 2015. *Stata Statistical Software: Release 14.* College Station, TX: StataCorp LP.
 
 * E. Leuven and B. Sianesi. 2003. *PSMATCH2: Stata module to perform full Mahalanobis and propensity score matching, common support graphing, and covariate imbalance testing*.    [(link)](http://ideas.repec.org/c/boc/bocode/s432001.html). Version 4.0.11. To install in STATA, use command:
-```ssc install psmatch2````
+```
+ssc install psmatch2
+```
 
 * Elizabeth A. Stuart. 2010. *Matching Methods for Causal Inference:
 A Review and a Look Forward,* Statistical Science, Vol. 25, No. 1, 1–21.
@@ -71,13 +73,12 @@ You can access the complete codebook with the command `codebook` after loading t
  | Randomized Clinical Trial | Observational Study
 :--- | :--- | :---
 **Treatment Assignment:** | Investigators generate a treatment schedule prior to patient enrollment.  The schedule is constructed based on the design of the study, which includes randomization in some fashion.  Physicians (who may be blind to treatment as well) assign treatments/exposures to study participants following the sequence in the schedule. |<ul> <li>Phyicians assign treatment/exposure based on <ul><li> characteristics of the patient</li><li> personal preference</li><li> regional preference</li><li> insurance restrictions</li></ul></li><li>Study participants choose for themselves treatments or behaviors</li><li>Exposures are based on geographic location or cultural identity</li></ul>
+<td colspan="3">CONSEQUENTLY ...</td>
+**Probability of Treatment:**| Known | Unknown, may be 0 or 1
+**Covariate Balance:** | Relationship between covariates and treatment assignment are known from study design. Usually the study is designed so that there is no relationship between treatment assignment and covariates. | Relationship between covariates and treatment assignment is unknown.  There may be covariate imbalance.
 
 <img src="unexposed-exposed-populations.svg" style="width:80vw;"></img>
 
- | Randomized Clinical Trial | Observational Study
-:--- | :--- | :---
-**Probability of Treatment:**| Known | Unknown, may be 0 or 1
-**Covariate Balance:** | Relationship between covariates and treatment assignment are known from study design. Usually the study is designed so that there is no relationship between treatment assignment and covariates. | Relationship between covariates and treatment assignment is unknown.  There may be covariate imbalance.
 
 ## STATISTICAL ANALYSIS OF TREATMENT EFFECTS WITH OBSERVATIONAL DATA
 
