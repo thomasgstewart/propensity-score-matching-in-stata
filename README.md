@@ -73,7 +73,7 @@ You can access the complete codebook with the command `codebook` after loading t
  | Randomized Clinical Trial | Observational Study
 :--- | :--- | :---
 **Treatment Assignment:** | Investigators generate a treatment schedule prior to patient enrollment.  The schedule is constructed based on the design of the study, which includes randomization in some fashion.  Physicians (who may be blind to treatment as well) assign treatments/exposures to study participants following the sequence in the schedule. |<ul> <li>Phyicians assign treatment/exposure based on <ul><li> characteristics of the patient</li><li> personal preference</li><li> regional preference</li><li> insurance restrictions</li></ul></li><li>Study participants choose for themselves treatments or behaviors</li><li>Exposures are based on geographic location or cultural identity</li></ul>
-<td colspan="3">CONSEQUENTLY ...</td>
+**CONSEQUENTLY ...**| | 
 **Probability of Treatment:**| Known | Unknown, may be 0 or 1
 **Covariate Balance:** | Relationship between covariates and treatment assignment are known from study design. Usually the study is designed so that there is no relationship between treatment assignment and covariates. | Relationship between covariates and treatment assignment is unknown.  There may be covariate imbalance.
 
