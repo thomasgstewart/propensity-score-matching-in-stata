@@ -104,8 +104,6 @@ Phyicians assign treatment/exposure based on
 <td colspan="3">
 <strong>CONSEQUENTLY ...</strong>
 </td>
-<td align="left"></td>
-<td align="left"></td>
 </tr>
 <tr>
 <td align="left">
