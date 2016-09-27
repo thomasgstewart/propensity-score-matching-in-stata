@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Propensity-score-matching-in-stata : ">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Propensity-score-matching-in-stata</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/thomasgstewart/propensity-score-matching-in-stata">View on GitHub</a>
+
+          <h1 id="project_title">Propensity-score-matching-in-stata</h1>
+          <h2 id="project_tagline"></h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/thomasgstewart/propensity-score-matching-in-stata/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/thomasgstewart/propensity-score-matching-in-stata/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="an-introduction-to-propensity-score-matching-in-stata" class="anchor" href="#an-introduction-to-propensity-score-matching-in-stata" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>An introduction to propensity score matching in STATA</h1>
+
+<p>Thomas G. Stewart
+Assistant Professor</p>
+
+<p>This lecture is part 9 of the <em>Propensity Scores and Related Methods Series</em> presented and organized by Robert Greevy within Vanderbilt University's Center for Health Services Research.</p>
+
+<h2>
+<a id="note-1" class="anchor" href="#note-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>NOTE 1</h2>
+
+<p>I reserve the right for these notes to be wrong, mistaken, or incomplete.</p>
+
+<h2>
+<a id="note-2" class="anchor" href="#note-2" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>NOTE 2</h2>
+
+<p>These notes will continue to be updated as I</p>
+
+<ul>
+<li>expand the content</li>
+<li>generate more examples</li>
+<li>respond to helpful feedback regarding items in NOTE 1.</li>
+</ul>
+
+<p>Please feel free to provide content and comments.</p>
+
+<h2>
+<a id="software" class="anchor" href="#software" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>SOFTWARE</h2>
+
+<ul>
+<li><p>StataCorp. 2015. <em>Stata Statistical Software: Release 14.</em> College Station, TX: StataCorp LP.</p></li>
+<li><p>E. Leuven and B. Sianesi. 2003. <em>PSMATCH2: Stata module to perform full Mahalanobis and propensity score matching, common support graphing, and covariate imbalance testing</em>.    <a href="http://ideas.repec.org/c/boc/bocode/s432001.html">(link)</a>. Version 4.0.11. To install in STATA, use command:</p></li>
+</ul>
+
+<pre><code>ssc install psmatch2
+</code></pre>
+
+<ul>
+<li>Phil Clayton. 2013. <em>TABLE1: module to create "table 1" of baseline characteristics for a manuscript</em>. Version 1.1.  To install in STATA, use command:</li>
+</ul>
+
+<pre><code>ssc install table1
+</code></pre>
+
+<h2>
+<a id="references" class="anchor" href="#references" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>REFERENCES</h2>
+
+<ul>
+<li>Elizabeth A. Stuart. 2010. <em>Matching Methods for Causal Inference:
+A Review and a Look Forward,</em> Statistical Science, Vol. 25, No. 1, 1–21.</li>
+</ul>
+
+<h2>
+<a id="data-for-examples-and-discussion" class="anchor" href="#data-for-examples-and-discussion" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>DATA FOR EXAMPLES AND DISCUSSION</h2>
+
+<p>To motivate the propensity score matching, I'll use the <code>cattaneo2</code> dataset, a STATA example dataset.  It can be loaded with the following command:</p>
+
+<div class="highlight highlight-source-stata"><pre>webuse cattaneo2</pre></div>
+
+<p>The data in <code>cattaneo2</code> is a subset of data that was analysed in the following journal articles:</p>
+
+<ul>
+<li><p>Almond, D., Chay, K.Y., Lee, D.S., 2005. <em>The costs of low birth weight,</em> Quarterly Journal of Economics 120, 1031-1083.</p></li>
+<li><p>Cattaneo, M.D. 2010. <em>Efficient semiparametric estimation of multi-valued treatment effects under ignorability,</em> Journal of Econometrics, 155(2), 138-154.</p></li>
+</ul>
+
+<p>The dataset included information about infant/mother/father characteristics from singleton births in Pennsylvania between 1989 and 1991.  The original dataset included nearly 500,000 births.  The STATA example dataset includes 4642 births.</p>
+
+<blockquote>
+<p><strong>RESEARCH QUESTION</strong>: What is the effect of maternal smoking during pregnancy on the infant's birthweight?</p>
+</blockquote>
+
+<p>The dataset includes the following set of variables:</p>
+
+<table>
+<thead>
+<tr>
+<th align="left">Infant</th>
+<th align="left">Mother</th>
+<th align="left">Father</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">birth weight (grams)</td>
+<td align="left">married/not married</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">birth month</td>
+<td align="left">hispanic (yes/no)</td>
+<td align="left">hispanic (yes/no)</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">race (white/not white)</td>
+<td align="left">race (white/not white)</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">age</td>
+<td align="left">age</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">education</td>
+<td align="left">education</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">foreign born (yes/no)</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">birth number</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">months since last birth</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">infant of previous births died (yes/no)</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">number of prenatal care visits</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">trimester of first prenatal care visit</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">alcohol during pregnancy (yes/no)</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">smoking during pregnancy (0, 1-5, 6-10, 11+ daily)</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">smoking during pregnancy (yes/no)</td>
+<td align="left"></td>
+</tr>
+</tbody>
+</table>
+
+<p>You can access the complete codebook with the command <code>codebook</code> after loading the data.</p>
+
+<h2>
+<a id="big-picture-background" class="anchor" href="#big-picture-background" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>BIG PICTURE: BACKGROUND</h2>
+
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left">Randomized Clinical Trial</th>
+<th align="left">Observational Study</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">
+<strong>Treatment Assignment:</strong>
+</td>
+<td align="left">Investigators generate a treatment schedule prior to patient enrollment. The schedule is constructed based on the design of the study, which includes randomization in some fashion. Physicians (who may be blind to treatment as well) assign treatments/exposures to study participants following the sequence in the schedule.</td>
+<td align="left">
+<ul>
+<li>
+Phyicians assign treatment/exposure based on
+<ul>
+<li> characteristics of the patient</li>
+<li> personal preference</li>
+<li> regional preference</li>
+<li> insurance restrictions</li>
+</ul>
+</li>
+<li>Study participants choose for themselves treatments or behaviors</li>
+<li>Exposures are based on geographic location or cultural identity</li>
+</ul>
+</td>
+</tr>
+<tr>
+<td colspan="3">
+<strong>CONSEQUENTLY</strong>
+</td>
+</tr>
+<tr>
+<td align="left">
+<strong>Probability of Treatment:</strong>
+</td>
+<td align="left">Known</td>
+<td align="left">Unknown, may be 0 or 1</td>
+</tr>
+<tr>
+<td align="left">
+<strong>Covariate Balance:</strong>
+</td>
+<td align="left">Relationship between covariates and treatment assignment are known from study design. Usually the study is designed so that there is no relationship between treatment assignment and covariates.</td>
+<td align="left">Relationship between covariates and treatment assignment is unknown. There may be covariate imbalance.</td>
+</tr>
+</tbody>
+</table>
+
+<h2>
+<a id="big-picture-challenges" class="anchor" href="#big-picture-challenges" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>BIG PICTURE: CHALLENGES</h2>
+
+<p>Differences in outcomes between the treated and untreated (or exposed and unexposed) may be the consequence of confounding variables and not the treatment (or exposure).</p>
+
+<p>Dataset may include sub-groups for which a treatment effect should not be calculated because</p>
+
+<ul>
+<li>the sub-group may not be eligible for one treatment (a treatment effect should only be calculated in populations eligible for both treatments)</li>
+<li>though a sub-group may be eligible for both treatments, there may not be enough data for a comparison without extrapolation.</li>
+</ul>
+
+<h2>
+<a id="big-picture-solutions" class="anchor" href="#big-picture-solutions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>BIG PICTURE: SOLUTIONS</h2>
+
+<p>There are several methods for estimating a treatment effect with observational data.  In this lecture series, you have been exposed (not randomly) to a family of methods which use the propensity score.  The primary focus has been on propensity score matching.</p>
+
+<h3>
+<a id="steps-a-summary-of-stuart-2010" class="anchor" href="#steps-a-summary-of-stuart-2010" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>STEPS (A SUMMARY OF STUART 2010)</h3>
+
+<ol>
+<li>Defining “closeness”: the distance measure used to determine whether an individual is a good match for another.
+
+<ol>
+<li>Variables to include
+
+<ul>
+<li>Researchers should thus be liberal in terms of including variables that may be associated with treatment assignment and/or the outcomes.</li>
+<li>One type of variable that should not be included in the  matching  process  is  any  variable  that  may  have been affected by the treatment of interest (Rosenbaum, 1984; Frangakis and Rubin, 2002; Greenland, 2003).</li>
+</ul>
+</li>
+<li>Distance Measures
+
+<ul>
+<li>Exact</li>
+<li>Mahalanobis</li>
+<li>Propensity score / linear propensity score
+
+<ul>
+<li>With propensity score estimation, concern is not with the parameter estimates of the model, but rather with the resulting balance of the covariates (Augurzky and Schmidt, 2001).</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li> Implementing a matching method, given that measure of closeness.
+
+<ul>
+<li>Methods:
+
+<ol>
+<li>k:1 Nearest Neighbor
+
+<ul>
+<li>Estimates Average Treatment Effect in the Treated (ATT or ATET)</li>
+<li>May need a caliper</li>
+</ul>
+</li>
+<li>Subclassification</li>
+<li>Full matching</li>
+<li>Weighting (IPTW)</li>
+</ol>
+</li>
+<li>Assess Common Support
+
+<ul>
+<li> Examining the common support may indicate that it is not possible to reliably estimate the ATE.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Assessing the quality of the resulting matched samples, and perhaps iterating with steps 1 and 2 until well-matched samples result.
+
+<ul>
+<li>Perhaps  the  most  important  step  in  using  matching methods is to diagnose the quality of the resulting matched samples</li>
+<li>Tools:
+
+<ol>
+<li>Histograms / Density Plots / ECDF</li>
+<li>Standardized Bias / Standardized difference in means</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>Analysis of the outcome and estimation of the treatment effect, given the matching done in step 3.
+
+<ol>
+<li>After k:1 mathcing
+
+<ul>
+<li>May not need to account for matched pair</li>
+<li>Must use weights if matching was <em>with replacement</em>
+</li>
+<li>Use regression adjustment</li>
+</ul>
+</li>
+<li>After subclassification
+
+<ul>
+<li>Aggregation weights determine estimation of ATT or ATE</li>
+<li>Use regression adjustment</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+
+<h3>
+<a id="demonstration" class="anchor" href="#demonstration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>DEMONSTRATION</h3>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Propensity-score-matching-in-stata maintained by <a href="https://github.com/thomasgstewart">thomasgstewart</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
