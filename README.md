@@ -1,8 +1,9 @@
 # An introduction to propensity score matching in STATA
 
 Thomas G. Stewart
+Assistant Professor
 
-This lecture is part 9 of the *propensity scores and related methods series* presented and organized by Robert Greevy within Vanderbilt University's Center for Health Services Research.
+This lecture is part 9 of the *Propensity Scores and Related Methods Series* presented and organized by Robert Greevy within Vanderbilt University's Center for Health Services Research.
 
 ## NOTE 1
 
@@ -17,7 +18,7 @@ These notes will continue to be updated as I
 
 Please feel free to provide content and comments.
 
-## ACKNOWLEDGEMENTS & REFERENCES
+## SOFTWARE
 
 * StataCorp. 2015. *Stata Statistical Software: Release 14.* College Station, TX: StataCorp LP.
 
@@ -25,6 +26,13 @@ Please feel free to provide content and comments.
 ```
 ssc install psmatch2
 ```
+
+* Phil Clayton. 2013. *TABLE1: module to create "table 1" of baseline characteristics for a manuscript*. Version 1.1.  To install in STATA, use command:
+```
+ssc install table1
+```
+
+## REFERENCES
 
 * Elizabeth A. Stuart. 2010. *Matching Methods for Causal Inference:
 A Review and a Look Forward,* Statistical Science, Vol. 25, No. 1, 1–21.
@@ -68,7 +76,7 @@ birth month | hispanic (yes/no) | hispanic (yes/no)
 You can access the complete codebook with the command `codebook` after loading the data.
 
 
-## BIG PICTURE BACKGROUND
+## BIG PICTURE: BACKGROUND
 
 <table style = "table-layout: fixed;width: 100%;">
 <thead>
@@ -102,7 +110,7 @@ Phyicians assign treatment/exposure based on
 </tr>
 <tr>
 <td colspan="3">
-<strong>CONSEQUENTLY ...</strong>
+<strong>CONSEQUENTLY</strong>
 </td>
 </tr>
 <tr>
@@ -122,27 +130,50 @@ Phyicians assign treatment/exposure based on
 </tbody>
 </table>
 
-<img src="unexposed-exposed-populations.svg" style="width:80vw;"></img>
+## BIG PICTURE: CHALLENGES
 
+Differences in outcomes between the treated and untreated (or exposed and unexposed) may be the consequence of confounding variables and not the treatment (or exposure).
 
-## STATISTICAL ANALYSIS OF TREATMENT EFFECTS WITH OBSERVATIONAL DATA
+Dataset may include sub-groups for which a treatment effect should not be calculated because
+* the sub-group may not be eligible for one treatment (a treatment effect should only be calculated in populations eligible for both treatments)
+* though a sub-group may be eligible for both treatments, there may not be enough data for a comparison without extrapolation.
+
+## BIG PICTURE: SOLUTIONS
 
 There are several methods for estimating a treatment effect with observational data.  In this lecture series, you have been exposed (not randomly) to a family of methods which use the propensity score.  The primary focus has been on propensity score matching.
 
-### PROPENSITY SCORE MATCHING
+### STEPS (A SUMMARY OF STUART 2010)
+1. Defining “closeness”: the distance measure used to determine whether an individual is a good match for another.
+   1. Variables to include
+      * Researchers should thus be liberal in terms of including variables that may be associated with treatment assignment and/or the outcomes.
+      * One type of variable that should not be included in the  matching  process  is  any  variable  that  may  have been affected by the treatment of interest (Rosenbaum, 1984; Frangakis and Rubin, 2002; Greenland, 2003).
+   2. Distance Measures
+      * Exact
+      * Mahalanobis
+      * Propensity score / linear propensity score
+         * With propensity score estimation, concern is not with the parameter estimates of the model, but rather with the resulting balance of the covariates (Augurzky and Schmidt, 2001).
+2.  Implementing a matching method, given that measure of closeness.
+   * Methods:
+      1. k:1 Nearest Neighbor
+         * Estimates Average Treatment Effect in the Treated (ATT or ATET)
+         * May need a caliper
+      2. Subclassification
+      3. Full matching
+      4. Weighting (IPTW)
+   * Assess Common Support
+      *  Examining the common support may indicate that it is not possible to reliably estimate the ATE.
+3. Assessing the quality of the resulting matched samples, and perhaps iterating with steps 1 and 2 until well-matched samples result.
+   * Perhaps  the  most  important  step  in  using  matching methods is to diagnose the quality of the resulting matched samples
+   * Tools:
+      1. Histograms / Density Plots / ECDF
+      2. Standardized Bias / Standardized difference in means
+4. Analysis of the outcome and estimation of the treatment effect, given the matching done in step 3.
+   1. After k:1 mathcing
+      * May not need to account for matched pair
+      * Must use weights if matching was *with replacement*
+      * Use regression adjustment
+   2. After subclassification
+      * Aggregation weights determine estimation of ATT or ATE
+      * Use regression adjustment
 
-<img src="unexposed-exposed-populations-paired.svg" style="width:80vw;"></img>
-<img src="unexposed-exposed-one-to-one-paired.svg" style="width:80vw;"></img>
-<img src="unexposed-exposed-two-to-one-paired.svg" style="width:80vw;"></img>
-<img src="unexposed-exposed-three-to-one-paired.svg" style="width:80vw;"></img>
-
-
-### GOAL
-
-Estimate the effect of maternal smoking on infant birthweight.
-
-### IN STATA: ONE-TO-ONE MATCHING WITH COVARIATE ADJUSTMENT
-
-### IN STATA: ONE-TO-ONE MATCHING, NO COVARIATE ADJUSTMENT
-
-### IN STATA: BOOM
+### DEMONSTRATION
