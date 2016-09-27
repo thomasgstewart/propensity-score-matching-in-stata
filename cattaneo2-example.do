@@ -7,8 +7,8 @@ egen float medu2 = cut(medu), at(0 9 12 13 17 18) // create coarse education gro
 
 * TABLE 1, UNADJUSTED
 table1, by(mbsmoke)      ///
-  vars(  alcohol cat     /// 
-       \ deadkids cat    /// 
+  vars(  alcohol cat     ///
+       \ deadkids cat    ///
        \ foreign cat     ///
        \ mage conts      ///
        \ medu cat        ///
@@ -18,7 +18,7 @@ table1, by(mbsmoke)      ///
        \ nprenatal conts ///
        \ order cat       ///
        \ prenatal cat    ///
-       )
+       ) onecol
 
 * TABLE 1, BIAS
 pstest alcohol deadkids foreign mage i.medu2 mhisp ///
@@ -29,7 +29,7 @@ pstest alcohol deadkids foreign mage i.medu2 mhisp ///
 pstest alcohol deadkids foreign mage medu2 mhisp ///
  mmarried mrace nprenatal order prenatal ///
  , raw treated(mbsmoke) graph
- 
+
 
 * INDIVIDUAL CONTINUOUS COVARIATES
 pstest mage, density raw treated(mbsmoke)
@@ -65,19 +65,19 @@ twoway ///
  (kdensity logodds if mbsmoke == 1, lcolor(navy) lwidth(thick)) ///
  (kdensity logodds if mbsmoke == 0, lcolor(red) lwidth(thick))  ///
  , legend(order(1 "SMOKER" 2 "NON-SMOKER"))
- 
+
 * PLOT PROPENSITY SCORE AFTER
 twoway ///
  (kdensity logodds if mbsmoke == 1, lcolor(navy) lwidth(thick)) ///
  (kdensity logodds if mbsmoke == 0, lcolor(red) lwidth(thick))  ///
  if _weight == 1 ///
- , legend(order(1 "SMOKER" 2 "NON-SMOKER")) 
- 
+ , legend(order(1 "SMOKER" 2 "NON-SMOKER"))
+
  * COVARIATE BALANCE
  pstest alcohol deadkids foreign mage i.medu2 mhisp ///
  mmarried mrace nprenatal order i.prenatal ///
  , both treated(mbsmoke) graph
- 
+
 * COVARIATE BALANCE, CONTINUOUS VARIABLES
 cumul mage if _weight == 1 & mbsmoke == 1, generate(ecdf_mage_1)
 cumul mage if _weight == 1 & mbsmoke == 0, generate(ecdf_mage_0)
@@ -97,12 +97,12 @@ twoway (line ecdf_nprenatal_1 nprenatal if ecdf_nprenatal_1 ~= ., sort) ///
   (line ecdf_nprenatal_0 nprenatal if ecdf_nprenatal_0 ~= ., sort) ///
   , legend(order(1 "SMOKER" 2 "NON-SMOKER"))
 
- 
-* TABLE 1, ONE-TO-ONE SAMPLE, CATEGORICAL VARIABLES 
+
+* TABLE 1, ONE-TO-ONE SAMPLE, CATEGORICAL VARIABLES
 table1 if _weight == 1   ///
       , by(mbsmoke)      ///
-  vars(  alcohol cat     /// 
-       \ deadkids cat    /// 
+  vars(  alcohol cat     ///
+       \ deadkids cat    ///
        \ foreign cat     ///
        \ medu2 cat       ///
        \ mhisp cat       ///
@@ -110,7 +110,7 @@ table1 if _weight == 1   ///
        \ mrace cat       ///
        \ order cat       ///
        \ prenatal cat    ///
-       )
+       ) onecol
 
 * WHERE IS THE LACK OF OVERLAP?
 generate smoke_group = 1*(mbsmoke == 1 & _weight == 1) + ///
@@ -118,13 +118,13 @@ generate smoke_group = 1*(mbsmoke == 1 & _weight == 1) + ///
 		       3*(mbsmoke == 0 & _weight == 1) + ///
 		       4*(mbsmoke == 0 & _weight == .)
 
-label define smoke_group 1 "Smoker IN" 2 "Smoker OUT" 3 "Non-smoker IN" 4 "Non-smoker OUT" 
+label define smoke_group 1 "Smoker IN" 2 "Smoker OUT" 3 "Non-smoker IN" 4 "Non-smoker OUT"
 label values smoke_group smoke_group
 
 table1 ///
       , by(smoke_group)      ///
-  vars(  alcohol cat     /// 
-       \ deadkids cat    /// 
+  vars(  alcohol cat     ///
+       \ deadkids cat    ///
        \ foreign cat     ///
        \ mage conts      ///
        \ medu2 cat       ///
@@ -142,7 +142,3 @@ twoway (scatter smoke_group logodds, sort jitter(15) jitterseed(1))
 * ESTIMATE OF SMOKING EFFECT ON BIRTHWEIGHT
 
 regress bweight mbsmoke alcohol deadkids foreign rcs_* mhisp i.medu2 mmarried mrace i.prenatal if _weight == 1
-
-
-
-
